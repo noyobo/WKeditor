@@ -1,16 +1,10 @@
-/*
-combined files : 
-
-gallery/WKeditor/1.0/index
-
-*/
 /**
- * @fileoverview 
+ * @fileoverview
  * @author changyuan.lcy/核心 <changyuan.lcy@alibaba-inc.com>
  * @module WKeditor
  **/
 
-KISSY.add('gallery/WKeditor/1.0/index',function (S, Node,XTemplate,WKfont) {
+KISSY.add(function(S, Node, XTemplate, WKfont) {
     var EMPTY = '';
     var $ = Node.all;
     /**
@@ -22,23 +16,23 @@ KISSY.add('gallery/WKeditor/1.0/index',function (S, Node,XTemplate,WKfont) {
         self.options = options;
     }
     WKeditor.prototype.tpl = {
-        wrap:$("<div class='WKeditor_wrap'></div>")
+        wrap: $("<div class='WKeditor_wrap'></div>")
     };
-    WKeditor.prototype.view = function(){
+    WKeditor.prototype.view = function() {
         var self = this;
-        
-        this.view.init = function(){
+
+        this.view.init = function() {
             self.options.$wrap = $(self.tpl.wrap);
             self.$wrap = self.options.$wrap
-            self.$wrap.attr("contenteditable",true);
+            self.$wrap.attr("contenteditable", true);
             //self.$wrap.html(self.get("message"));
             self.view.message();
             self.ele.append(self.$wrap);
         };
-        this.view.message = function(){
+        this.view.message = function() {
             self.$message = $(self.options.message);
             self.ele.append(self.$message);
-            self.$message.on("click",function(){
+            self.$message.on("click", function() {
                 self.$wrap.fire("focus");
                 $(this).hide();
             });
@@ -47,7 +41,7 @@ KISSY.add('gallery/WKeditor/1.0/index',function (S, Node,XTemplate,WKfont) {
         this.view.init();
     };
     // 扩展文本格式接口
-    WKeditor.prototype.addFont = function(data,callback){
+    WKeditor.prototype.addFont = function(data, callback) {
         var self = this;
         var tpl = "<button command='{{command}}' class='{{name}} command' title='{{title}}' >{{value}}</button>";
         var temp = new XTemplate(tpl).render(data);
@@ -55,13 +49,13 @@ KISSY.add('gallery/WKeditor/1.0/index',function (S, Node,XTemplate,WKfont) {
         self.WKfont.view.render();
         var buttons = self.WKfont.$font.all("button");
         var len = buttons.length;
-        var last = $(buttons[len-1]);
-        last.on("click",function(e){
+        var last = $(buttons[len - 1]);
+        last.on("click", function(e) {
             callback(e);
         });
     };
     // 扩展插件接口
-    WKeditor.prototype.plug = function(data,callback){
+    WKeditor.prototype.plug = function(data, callback) {
         var self = this;
         self.plugin();
         var tpl = "<button class='{{name}}' title='{{title}}'>{{value}}</button>";
@@ -70,358 +64,370 @@ KISSY.add('gallery/WKeditor/1.0/index',function (S, Node,XTemplate,WKfont) {
         self.plugin.render();
         self[data.name] = callback;
     };
-    WKeditor.prototype.plugin = function(config){
+    WKeditor.prototype.plugin = function(config) {
         var self = this;
         this.plugin.tpl = {
-            wrap:"<div class='WKeditor_plugin'><div class='box'></div></div>",
-            arrow:"<div class='arrow-outer'><div class='arrow-shadow'></div></div>"
+            wrap: "<div class='WKeditor_plugin'><div class='box'></div></div>",
+            arrow: "<div class='arrow-outer'><div class='arrow-shadow'></div></div>"
         };
-        this.plugin.init = function(){
-            if(self.$plugin){
+        this.plugin.init = function() {
+            if (self.$plugin) {
                 return;
             }
             self.plugin.view();
             self.plugin.event();
         };
-        this.plugin.view = function(){
+        this.plugin.view = function() {
             self.$plugin = $(self.plugin.tpl.wrap);
             self.$plugin.append(self.plugin.tpl.arrow);
             self.ele.append(self.$plugin);
             self.plugin.render();
         };
 
-        this.plugin.event = function(){
-            self.$plugin.delegate("click","button",function(e){
+        this.plugin.event = function() {
+            self.$plugin.delegate("click", "button", function(e) {
                 self.$wrap.fire("focus");
                 self.options.range = self.tool.getRange();
-
                 var name = $(e.target).attr("class");
                 self[name]();
                 return false;
             });
         };
-        this.plugin.render = function(){
-            self.$plugin.height(self.$plugin.all("button").length*33);
+        this.plugin.render = function() {
+            self.$plugin.height(self.$plugin.all("button").length * 33);
             self.$plugin.one(".arrow-outer").css({
-                top:(self.$plugin.height())/2-11
+                top: (self.$plugin.height()) / 2 - 11
             });
         };
         this.plugin.init();
     };
-    WKeditor.prototype.event = function(){
+    WKeditor.prototype.event = function() {
         var self = this;
 
         self.$wrap
-            .on("click",function(){
+            .on("click", function() {
                 self.$message.hide();
             })
-
-            .on("blur",function(){
-                if($(this).html().replace("<span></span>","").replace("<br>","") == ''){
+            .on("blur", function() {
+                if ($(this).html().replace("<span></span>", "").replace("<br>", "") == '') {
                     self.$message.show();
-                }   
-            })
-            .on("mousedown",function(){
-                self.$message.hide();
-                self.options.range = self.tool.getRange();
-            })
-            .on("mousemove",function(e){
-                var element = e.target;
-                switch(element.tagName.toLowerCase()){
-                    case "img":
-                        self.event.showImgOp(element);
-                    break;
-                    default:
-                        self.event.hideImgOp();
-                    break;
                 }
             })
+            .on("mousedown", function(event) {
+                self.$message.hide();
+                if (event.target.tagName == 'EMBED' || event.target.tagName == 'OBJECT') {
+                    return true;
+                } else {
+                    self.options.range = self.tool.getRange();
+                }
+            })
+            .on("mousemove", function(e) {
+                var element = e.target;
+                switch (element.tagName.toLowerCase()) {
+                    case "img":
+                        self.event.showImgOp(element);
+                        break;
+                    default:
+                        self.event.hideImgOp();
+                        break;
+                }
+            })
+            .on("keydown", function(e) {
+                if (e.keyCode == 13) {
 
-            .on("keydown",function(e){
-                if(e.keyCode == 13){
-                    
-                    setTimeout(function(){
-                        S.each(self.$wrap.all("p"),function(dom){
-                            if($(dom).all("img").length == 0 && $(dom).all("embed").length==0 && $(dom).all("video").length==0){
-                                 $(dom).removeAttr("class").removeAttr("style");
-                            } 
+                    setTimeout(function() {
+                        S.each(self.$wrap.all("p"), function(dom) {
+                            if ($(dom).all("img").length == 0 && $(dom).all("embed").length == 0 && $(dom).all("video").length == 0) {
+                                $(dom).removeAttr("class").removeAttr("style");
+                            }
                         });
                         self.tool.formatBlock();
-                    },10);
+                    }, 10);
 
                 }
             })[0]
-            .onpaste = function(e){
-                if(self.browser.chrome||self.browser.mozilla){
+            .onpaste = function(e) {
+                if (self.browser.chrome || self.browser.mozilla) {
                     self.event.shotImg(e);
                 }
                 self.tool.fliter(self.$wrap);
-            };
-        self.event.shotImg = function(e){
+        };
+        self.event.shotImg = function(e) {
             var clipboardData = e.clipboardData;
-            if(clipboardData&&clipboardData.items){
+            if (clipboardData && clipboardData.items) {
                 items = clipboardData.items;
                 var item = items[0];
-                if (item.kind == 'file' && item.type == 'image/png') {  
-                    var fileReader = new FileReader();  
-                      
-                    fileReader.onloadend = function (d) {  
-                        var d = this.result.substr( this.result.indexOf(',')+1);
-                        var img =  document.createElement("img");
-                        img.src = 'data:image/jpeg;base64,'+d;
+                if (item.kind == 'file' && item.type == 'image/png') {
+                    var fileReader = new FileReader();
+
+                    fileReader.onloadend = function(d) {
+                        var d = this.result.substr(this.result.indexOf(',') + 1);
+                        var img = document.createElement("img");
+                        img.src = 'data:image/jpeg;base64,' + d;
                         //area.append(img);
-                        self.tool.insert(img,self.tool.getRange());
+                        self.tool.insert(img, self.tool.getRange());
                         return;
                     };
                     fileReader.readAsDataURL(item.getAsFile());
-                } 
+                }
             }
         }
-        self.event.showImgOp = function(el){
+        self.event.showImgOp = function(el) {
             var $area = self.ele;
             var img = $(el);
-            function setPosition(btn,n){
+
+            function setPosition(btn, n) {
                 n = n || 0;
                 btn.css({
-                    left:img.offset().left+img.width()-33-self.left-n,
-                    top:img.offset().top-self.top,
-                    position:"absolute",
-                    display:"block"
+                    left: img.offset().left + img.width() - 33 - self.left - n,
+                    top: img.offset().top - self.top,
+                    position: "absolute",
+                    display: "block",
+                    cursor:'pointer'
                 });
             }
-            void function removeBtn(){
+            void
+
+            function removeBtn() {
                 var button = $area.all(".removeImage");
-                if($area.all(".removeImage").length==0){
+                if ($area.all(".removeImage").length == 0) {
                     button = $("<button class='removeImage'></button>");
                     $area.append(button);
                 }
                 setPosition(button);
-                button.detach().on("click",function(){
-                    if(img.attr("loadingid")){
-                        var loadingimg = $("#editorMain").all("img[loadingid="+img.attr("loadingid")+"]");
-                        if(loadingimg.length>0){
+                button.detach().on("click", function() {
+                    if (img.attr("loadingid")) {
+                        var loadingimg = $("#editorMain").all("img[loadingid=" + img.attr("loadingid") + "]");
+                        if (loadingimg.length > 0) {
                             loadingimg.remove();
                         }
                     }
-                    self.tool.setCart(img.parent()[0],self.options.range);
+                    self.tool.setCart(img.parent()[0], self.options.range);
                     img.remove();
-
                     button.hide();
                     return false;
                 });
             }();
-            function centerBtn(){
+
+            function centerBtn() {
                 var button = $area.all(".centerImage");
-                if($area.all(".centerImage").length==0){
+                if ($area.all(".centerImage").length == 0) {
                     button = $("<button class='centerImage'>居中</button>");
                     $area.append(button);
                 }
-                setPosition(button,46);
-                button.detach("click").on("click",function(){
+                setPosition(button, 46);
+                button.detach("click").on("click", function() {
                     var p = $("<p style='text-align:center'></p>");
                     img.before(p);
                     p.append(img);
                     self.event.hideImgOp();
-                    
+
                     return false;
                 });
             }
-            if(img.parent().css("text-align")!="center"){
+            if (img.parent().css("text-align") != "center") {
                 centerBtn();
             }
         }
-        self.event.hideImgOp = function(){
+        self.event.hideImgOp = function() {
             var $area = self.ele;
-            
-            void function removeBtn(){
+
+            void
+
+            function removeBtn() {
                 var button = $area.all(".removeImage");
-                if(button){
+                if (button) {
                     button.hide();
                 }
             }();
-            void function centerBtn(){
+            void
+
+            function centerBtn() {
                 var button = $area.all(".centerImage");
-                if(button){
+                if (button) {
                     button.hide();
                 }
             }();
         }
     };
     WKeditor.prototype.reg = {
-        hrefReg:/http:\/\/[a-zA-Z\d.]*wanke.etao.com[\/a-zA-Z\d?=.&+%]*/g,
-        cdnReg:/taobaocdn[.a-z]*\/tfscom/,
-        fliterReg:"IMG|P|SPAN|FONT|A|UL|LI|DIV|H1|H2|H3|H4|H5|H6|BR|EMBED|EM|VIDEO|B|STRONG|U|LABEL|BIG|S|I|OL|DL|DD|DT|SUB|SUP"
+        hrefReg: /http:\/\/[a-zA-Z\d.]*wanke.etao.com[\/a-zA-Z\d?=.&+%]*/g,
+        cdnReg: /taobaocdn[.a-z]*\/tfscom/,
+        fliterReg: "IMG|P|SPAN|FONT|A|UL|LI|DIV|H1|H2|H3|H4|H5|H6|BR|EMBED|EM|VIDEO|B|STRONG|U|LABEL|BIG|S|I|OL|DL|DD|DT|SUB|SUP"
     };
     WKeditor.prototype.language = {
-        video:'请粘贴视频地址',
-        video2:'支持淘宝、优酷、土豆、酷6、搜狐网站视频链接',
-        product:'请输入你想分享的东西名称',
-        save:"正在保存...",
-        saveSuc:"保存成功"
+        video: '请粘贴视频地址',
+        video2: '支持淘宝、优酷、土豆、酷6、搜狐网站视频链接',
+        product: '请输入你想分享的东西名称',
+        save: "正在保存...",
+        saveSuc: "保存成功"
     };
-    WKeditor.prototype.font = function(config){
+    WKeditor.prototype.font = function(config) {
         var self = this;
         self.WKfont = new WKfont(self.options);
         self.WKfont.init(config);
     };
-    WKeditor.prototype.tool = function(){
+    WKeditor.prototype.tool = function() {
         var self = this;
         return {
-            fliter:function(dom){
+            fliter: function(dom) {
                 var FLITER_REG = self.reg.fliterReg;
-                function theNextReplace(){
-                    dom.all("*").each(function(){
+
+                function theNextReplace() {
+                    dom.all("*").each(function() {
                         var name = $(this)[0].tagName;
-                        
+
                         var _c = $(this).attr('class');
 
                         $(this).removeAttr("class");
                         $(this).removeAttr("id");
                         $(this).removeAttr("onclick");
                         $(this).removeAttr("onmoueover");
-                        if(_c == "wankeEditorLink"){
+                        if (_c == "wankeEditorLink") {
                             $(this).addClass("wankeEditorLink");
                         }
-                        if(_c == "h5-video"){
+                        if (_c == "h5-video") {
                             $(this).addClass("h5-video");
                         }
-                        if(name=="FONT"){
+                        if (name == "FONT") {
                             $(this).removeAttr("color");
                             $(this).removeAttr("face");
                         }
-                        if(name=="P"){
+                        if (name == "P") {
                             var center = $(this).css("text-align");
                             $(this).removeAttr("style");
-                            $(this).css("text-align",center);
-                        }else{
-                            if(name!="EMBED"){
+                            $(this).css("text-align", center);
+                        } else {
+                            if (name != "EMBED") {
                                 $(this).removeAttr("style");
                             }
                         }
                     });
                 }
-                setTimeout(function(){
+                setTimeout(function() {
                     var len = dom.all("*").length;
-                    dom.all("*").each(function(obj,index){
+                    dom.all("*").each(function(obj, index) {
                         var name = $(this)[0].tagName;
-                        if(!S.inArray(name,FLITER_REG.split("|"))){
+                        if (!S.inArray(name, FLITER_REG.split("|"))) {
                             $(this).remove();
                         }
-                        if(index==len-1){
+                        if (index == len - 1) {
                             theNextReplace();
                         }
                     });
-                },10);
+                }, 10);
             },
-            insertArea:function(){
+            insertArea: function() {
                 var id = +new Date();
-                var $insertArea = $("<div class='insertArea' id='"+id+"'></div>");
-                if(self.tool.removeHTML(self.$wrap.html())==self.tool.removeHTML(self.options.message)){
+                var $insertArea = $("<div class='insertArea' id='" + id + "'></div>");
+                if (self.tool.removeHTML(self.$wrap.html()) == self.tool.removeHTML(self.options.message)) {
                     self.$wrap.fire("click");
                     self.$wrap.fire("focus");
                     self.options.range = self.tool.getRange();
                 }
-                self.tool.insert($insertArea[0],self.options.range);
+                self.tool.insert($insertArea[0], self.options.range);
                 self.$message.hide();
-                return $("#"+id);
+                return $("#" + id);
             },
-            dragSort:function(self){
+            dragSort: function(self) {
                 self._default = {};
-                this.drag.apply($("#J_UploaderQueue").all(".queue-file"),[
-                    function(e){
+                this.drag.apply($("#J_UploaderQueue").all(".queue-file"), [
+                    function(e) {
                         // down
                         this.x = e.clientX - parseInt($(this).css("left"));
                         this.y = e.clientY - parseInt($(this).css("top"));
                         $(this).css({
-                            "opacity":1,
-                            zIndex:89
+                            "opacity": 1,
+                            zIndex: 89
                         });
                         self._default.dragDown = true;
                         $("#J_UploaderQueue").all(".queue-space").css({
-                            opacity:0,
-                            width:parseInt($("#J_UploaderQueue").attr("space"))-6
+                            opacity: 0,
+                            width: parseInt($("#J_UploaderQueue").attr("space")) - 6
                         });
                     },
-                    function(e){
+                    function(e) {
                         // move
-                        var left = e.clientX-this.x;
-                        var top =  e.clientY-this.y;
+                        var left = e.clientX - this.x;
+                        var top = e.clientY - this.y;
                         $(this).css({
-                            left:left,
-                            top:top
+                            left: left,
+                            top: top
                         });
 
-                        function inSpace(x,y){
-                            S.each($("#J_UploaderQueue").all(".queue-space"),function(dom){
-                                var l,t,w,h;
+                        function inSpace(x, y) {
+                            S.each($("#J_UploaderQueue").all(".queue-space"), function(dom) {
+                                var l, t, w, h;
                                 l = $(dom).offset().left;
                                 t = $(dom).offset().top;
                                 w = $(dom).width();
                                 h = $(dom).height();
-                                if(x>l&&x<(l+w)&&y>t&&y<(t+h)){
+                                if (x > l && x < (l + w) && y > t && y < (t + h)) {
                                     $(dom).css({
-                                        opacity:1
+                                        opacity: 1
                                     });
                                     self._default.space = $(dom);
-                                }else{
+                                } else {
                                     $(dom).css({
-                                        opacity:0
+                                        opacity: 0
                                     });
                                 }
                             });
                         }
-                        inSpace(e.clientX,e.clientY+$(window).scrollTop());
+                        inSpace(e.clientX, e.clientY + $(window).scrollTop());
 
                     },
-                    function(){
+                    function() {
                         // press
-                        if(self._default.space){
+                        if (self._default.space) {
                             self._default.space.before($(this));
                             $(this).animate({
-                                width:100,
-                                height:100
-                            },1/5);
-                            self.tool.realign($("#J_UploaderQueue"),"ani");
+                                width: 100,
+                                height: 100
+                            }, 1 / 5);
+                            self.tool.realign($("#J_UploaderQueue"), "ani");
                             self._default.space = null;
-                        }else{
+                        } else {
                             $(this).animate({
-                                left:$(this).attr('dleft'),
-                                top:$(this).attr('dtop'),
-                                width:100,
-                                height:100
-                            },1/3);
+                                left: $(this).attr('dleft'),
+                                top: $(this).attr('dtop'),
+                                width: 100,
+                                height: 100
+                            }, 1 / 3);
                         }
                         $(this).css({
-                            "opacity":1,
-                            zIndex:88
+                            "opacity": 1,
+                            zIndex: 88
                         })
                         self._default.dragDown = false;
                     },
                 ]);
             },
-            drag:function(downCallback,moveCallback,upCallback){
+            drag: function(downCallback, moveCallback, upCallback) {
                 var ele = this;
-                S.each(ele,function(dom){
+                S.each(ele, function(dom) {
                     dom.downCallback = downCallback;
                     dom.moveCallback = moveCallback;
                     dom.upCallback = upCallback;
 
-                    $(dom).css({cursor:"move"});
-                    $(dom).on("mousedown",function(e){
+                    $(dom).css({
+                        cursor: "move"
+                    });
+                    $(dom).on("mousedown", function(e) {
                         e.preventDefault();
 
                         dom.downCallback(e);
-                        document.onmousemove = function(e){
-                            e = e||event;
+                        document.onmousemove = function(e) {
+                            e = e || event;
                             window.getSelection ? window.getSelection().removeAllRanges() : document.selection.empty();
                             dom.moveCallback(e);
-                            //IE 去除容器内拖拽图片问题 
-                            if (document.all){
+                            //IE 去除容器内拖拽图片问题
+                            if (document.all) {
                                 e.returnValue = false;
                             }
 
                         }
-                        $(document).on("mouseup",function(e){
+                        $(document).on("mouseup", function(e) {
                             document.onmousemove = null;
                             $(document).detach("mouseup");
                             dom.upCallback(e);
@@ -433,110 +439,110 @@ KISSY.add('gallery/WKeditor/1.0/index',function (S, Node,XTemplate,WKfont) {
             /*
                 用于图片列表重排
             */
-            realign:function(ul,ani){
+            realign: function(ul, ani) {
                 var ele = ul;
                 var w = ele.width(),
                     opts = {
-                        minSpace:20,
-                        width:100,
-                        height:100
+                        minSpace: 20,
+                        width: 100,
+                        height: 100
                     },
-                    num = Math.floor(w/opts.width),
+                    num = Math.floor(w / opts.width),
                     child = ele.children(".queue-file"),
-                    expresstion = function(num){
-                        return (w-opts.width*num)/(num+1);
+                    expresstion = function(num) {
+                        return (w - opts.width * num) / (num + 1);
                     },
                     left = 0,
                     top = 0;
-                function findTNum(num){
+
+                function findTNum(num) {
                     w = ele.width();
                     var space = expresstion(num);
-                    if(space>opts.minSpace){
+                    if (space > opts.minSpace) {
                         var line = 0;
-                        S.each(child,function(dom,index){
-                            left = (opts.width+space)*(index%num)+space;
-                            top = (opts.height+space)*(Math.floor(index/num))+space;
-                            if(ani){
+                        S.each(child, function(dom, index) {
+                            left = (opts.width + space) * (index % num) + space;
+                            top = (opts.height + space) * (Math.floor(index / num)) + space;
+                            if (ani) {
                                 $(dom).animate({
-                                    left:left,
-                                    top:top
-                                },1/4);
-                            }else{
+                                    left: left,
+                                    top: top
+                                }, 1 / 4);
+                            } else {
                                 $(dom).css({
-                                    left:left,
-                                    top:top
+                                    left: left,
+                                    top: top
                                 });
                             }
-                            $(dom).attr('dleft',left).attr("dtop",top);
+                            $(dom).attr('dleft', left).attr("dtop", top);
                         });
-                        ele.height((Math.ceil(child.length/num))*(opts.height+space)+space);
-                        ele.attr("num",num).attr("space",space);
+                        ele.height((Math.ceil(child.length / num)) * (opts.height + space) + space);
+                        ele.attr("num", num).attr("space", space);
                         // setSpace
                         ele.all(".queue-space").remove();
                         ele.all(".beQs").removeClass("beQs");
 
                         var qs = $("<li class='queue-space'></li>");
                         qs.css({
-                            opacity:0,
-                            background:"#f8f8f8"
+                            opacity: 0,
+                            background: "#f8f8f8"
                         });
-                        S.each(child,function(dom,index){
-                            if($(dom).hasClass("beQs")){
+                        S.each(child, function(dom, index) {
+                            if ($(dom).hasClass("beQs")) {
                                 return;
                             }
-                            if(!$(dom).prev()||!$(dom).prev().hasClass("queue-space")||$(dom).prev().hasClass("linelast")){
+                            if (!$(dom).prev() || !$(dom).prev().hasClass("queue-space") || $(dom).prev().hasClass("linelast")) {
                                 $(dom).before(qs.clone());
                             }
-                            if((index+1)%num==0){
+                            if ((index + 1) % num == 0) {
                                 $(dom).after(qs.clone().addClass("linelast"));
-                            }
-                            else if(index==child.length-1){
+                            } else if (index == child.length - 1) {
                                 $(dom).after(qs.clone());
                             }
                             $(dom).addClass("beQs");
                         });
-                        S.each(ele.children(".queue-space"),function(dom,index){
-                            left = (opts.width+space)*(index%(num+1));
-                            top = (opts.height+space)*(Math.floor(index/(num+1)))+space;
+                        S.each(ele.children(".queue-space"), function(dom, index) {
+                            left = (opts.width + space) * (index % (num + 1));
+                            top = (opts.height + space) * (Math.floor(index / (num + 1))) + space;
                             $(dom).css({
-                                left:left,
-                                top:top
-                            }).attr("space",space);
+                                left: left,
+                                top: top
+                            }).attr("space", space);
                         });
-                    }else{
+                    } else {
                         num--;
-                        if(num>0){
+                        if (num > 0) {
                             findTNum(num);
                         }
                     }
                 }
                 findTNum(num);
             },
-            overlay:function(options){
-                var opts = S.merge(options,{
-                    opacity:0.6,
-                    background:"#666",
-                    zIndex:999
+            overlay: function(options) {
+                var opts = S.merge(options, {
+                    opacity: 0.6,
+                    background: "#666",
+                    zIndex: 999
                 });
                 var _class = {
-                    view:function(){
+                    view: function() {
                         _class.$overlay.css({
-                            top:0,
-                            left:0,
-                            height:$(document).height(),
-                            width:$(window).width(),
-                            position:"absolute",
-                            opacity:opts.opacity,
-                            background:opts.background,
-                            zIndex:parseInt(opts.ele.css("z-index"))-1||opts.zIndex
+                            top: 0,
+                            left: 0,
+                            height: $(document).height(),
+                            width: $(window).width(),
+                            position: "absolute",
+                            opacity: opts.opacity,
+                            background: opts.background,
+                            zIndex: parseInt(opts.ele.css("z-index")) - 1 || opts.zIndex
                         });
                     },
-                    event:function(){
-                        $(window).on("resize",function(){
+                    event: function() {
+                        $(window).on("resize", function() {
                             _class.view();
                         });
                     },
-                    init:function(){
+                    init: function() {
                         _class.$overlay = $("<div class='overlay'></div>");
                         _class.$overlay.appendTo($("body"));
                         _class.view();
@@ -546,110 +552,119 @@ KISSY.add('gallery/WKeditor/1.0/index',function (S, Node,XTemplate,WKfont) {
                 _class.init();
                 return _class;
             },
-            browser:function(){
-                var userAgent = window.navigator.userAgent.toLowerCase(); 
-                var object = { 
-                    version: (userAgent.match( /.+(?:rv|it|ra|ie)[\/: ]([\d.]+)/ ) || [0,'0'])[1], 
-                    safari: /webkit/.test( userAgent ) && !(/chrome/i.test(userAgent) && /webkit/i.test(userAgent) && /mozilla/i.test(userAgent)), 
-                    opera: /opera/.test( userAgent ), 
-                    msie: /msie/.test( userAgent ) && !/opera/.test( userAgent ), 
-                    mozilla: /mozilla/.test( userAgent ) && !/(compatible|webkit)/.test( userAgent )&& !(/chrome/i.test(userAgent) && /webkit/i.test(userAgent) && /mozilla/i.test(userAgent)),
+            browser: function() {
+                var userAgent = window.navigator.userAgent.toLowerCase();
+                var object = {
+                    version: (userAgent.match(/.+(?:rv|it|ra|ie)[\/: ]([\d.]+)/) || [0, '0'])[1],
+                    safari: /webkit/.test(userAgent) && !(/chrome/i.test(userAgent) && /webkit/i.test(userAgent) && /mozilla/i.test(userAgent)),
+                    opera: /opera/.test(userAgent),
+                    msie: /msie/.test(userAgent) && !/opera/.test(userAgent),
+                    mozilla: /mozilla/.test(userAgent) && !/(compatible|webkit)/.test(userAgent) && !(/chrome/i.test(userAgent) && /webkit/i.test(userAgent) && /mozilla/i.test(userAgent)),
                     chrome: /chrome/i.test(userAgent) && /webkit/i.test(userAgent) && /mozilla/i.test(userAgent)
                 };
                 return object;
             },
-            formatBlock:function(self){
-                document.execCommand('FormatBlock',false,'p');
+            formatBlock: function(self) {
+                document.execCommand('FormatBlock', false, 'p');
                 document.execCommand("RemoveFormat");
             },
             /**
              * 移除HTML代码
              * @param  {[type]} str 字符串
              */
-            removeHTML:function(str) {
+            removeHTML: function(str) {
                 str = str.toLowerCase();
-                str = str.replace(/<\/?[^>]*>/g,''); //去除HTML tag
-                str = str.replace(/[ | ]*\n/g,'\n'); //去除行尾空白
-                str = str.replace(/[\r\n\s"]/ig,"");
+                str = str.replace(/<\/?[^>]*>/g, ''); //去除HTML tag
+                str = str.replace(/[ | ]*\n/g, '\n'); //去除行尾空白
+                str = str.replace(/[\r\n\s"]/ig, "");
                 return str;
             },
-            getSelection:function(){
+            getSelection: function() {
                 return window.getSelection ? window.getSelection() : document.selection;
             },
-            getRange:function(){
-                var range;
-                    try{
-                        range = this.getSelection().createRange ? this.getSelection().createRange() : this.getSelection().getRangeAt(0);
-                    }catch(e){
-                        setTimeout(function(){
-                            range = this.getSelection().createRange ? this.getSelection().createRange() : this.getSelection().getRangeAt(0);
-                        },1);
-                    }
-                    if(range&&range.text){
-                        range.selectText = range.text
-                    }
+            getRange: function() {
+                var range = null;
+                var selection = this.getSelection();
 
-                    if(range&&range.toString){
-                        range.selectText = range.toString();
-                    }
-                    
-                
+                if (selection && selection.rangeCount == 0) {
+                    range = selection;
+                }else{
+                    range = selection.createRange? selection.createRange(): selection.getRangeAt(0)
+                }
+                 // try {
+                 //     range = this.getSelection().createRange ? this.getSelection().createRange() : this.getSelection().getRangeAt(0);
+                 // } catch (e) {
+                 //     setTimeout(function() {
+                 //         range = this.getSelection().createRange ? this.getSelection().createRange() : this.getSelection().getRangeAt(0);
+                 //     }, 1);
+                 // }
+
+                if (range && range.text) {
+                    range.selectText = range.text
+                }
+
+                if (range && range.toString) {
+                    range.selectText = range.toString();
+                }
+
                 return range;
             },
             //设置光标位置
-            setCart:function(dom,range) {
-                try{
-                    if(document.selection&&parseInt(self.browser.version)<9){
+            setCart: function(dom, range) {
+                try {
+                    if (document.selection && parseInt(self.browser.version) < 9) {
                         range.collapse(false);
                         range.select();
-                    }else{
+                    } else {
                         range.setStartAfter(dom);
                         range.collapse(true);
                         this.getSelection().removeAllRanges();
                         this.getSelection().addRange(range);
                     }
-                }catch(e){
+                } catch (e) {
 
                 }
             },
             //插入到光标位置
-            insert:function(dom,range){
-                range = range||this.tool.getRange();
+            insert: function(dom, range) {
+                range = range || this.tool.getRange();
                 var selection = this.getSelection();
-                if (!window.getSelection || (self.browser.msie && parseInt(self.browser.version)<9)){
+                if (!window.getSelection || (self.browser.msie && parseInt(self.browser.version) < 9)) {
                     range.pasteHTML(dom.outerHTML);
                     range.select();
-                }else{
+                } else {
                     var hasR = dom;
                     var hasR_lastChild = hasR.lastChild;
                     while (hasR_lastChild && hasR_lastChild.nodeName.toLowerCase() == "br" && hasR_lastChild.previousSibling && hasR_lastChild.previousSibling.nodeName.toLowerCase() == "br") {
                         var e = hasR_lastChild;
                         hasR_lastChild = hasR_lastChild.previousSibling;
                         hasR.removeChild(e)
-                    }                                
+                    }
                     range.insertNode(hasR);
                     if (hasR_lastChild) {
                         range.setEndAfter(hasR_lastChild);
                         range.setStartAfter(hasR_lastChild);
                     }
                 }
-                this.setCart(dom,range);
+                this.setCart(dom, range);
             }
         };
     }
-    WKeditor.prototype.init = function(){
+    WKeditor.prototype.init = function() {
         this.ele = $(this.options.ele);
         this.options.ele = this.ele;
-        this.left = this.options.left  = this.ele.offset().left;
-        this.top = this.options.top  = this.ele.offset().top;
-        this.tool = this.options.tool  = this.tool();
+        this.left = this.options.left = this.ele.offset().left;
+        this.top = this.options.top = this.ele.offset().top;
+        this.tool = this.options.tool = this.tool();
 
         this.view();
         this.event();
-        
+
         this.font(this.options.font);
-        
+
         this.browser = this.tool.browser();
     }
     return WKeditor;
-}, {requires:['node','xtemplate','./plugin/WKfont/WKfont','./index.css']});
+}, {
+    requires: ['node', 'xtemplate', './plugin/WKfont/WKfont', './index.css']
+});

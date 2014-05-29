@@ -2,7 +2,7 @@ KISSY.add(function (S, Node,XTemplate) {
     var EMPTY = '';
     var $ = Node.all;
     /**
-     * 
+     *
      * @class WKfont
      * @constructor
      * @extends Base
@@ -55,7 +55,7 @@ KISSY.add(function (S, Node,XTemplate) {
         self.$font = $(self.tpl.wrap),
             arr = [],
             temp = "";
-        if(self.config){     
+        if(self.config){
             for(var i=0,len=self.config.length;i<len;i++){
                 arr[i] = {
                     name:self.config[i],
@@ -68,8 +68,8 @@ KISSY.add(function (S, Node,XTemplate) {
         temp = new XTemplate(self.tpl.btn).render({data:arr})
         self.$font.append(temp);
         self.$font.append(self.tpl.arrow);
-        
-        
+
+
         self.view.render();
         self.ele.append(self.$font);
     };
@@ -108,7 +108,7 @@ KISSY.add(function (S, Node,XTemplate) {
             var range = self.tool.getRange();
             var l =  self.options.mouseOD.left-(self.options.mouseOD.left-self.options.mouseOU.left)/2-self.$font.width()/2;
             var t =  self.options.mouseOD.top-(self.options.mouseOD.top-self.options.mouseOU.top)/2-self.$font.height()-20;
-    
+
 
 
             if((l+self.$font.width()/2)<self.ele.offset().left){
@@ -145,11 +145,13 @@ KISSY.add(function (S, Node,XTemplate) {
                     left:e.clientX,
                     top:e.clientY+$(window).scrollTop()
                 };
-            }else if(S.inArray(e.target,self.$font.all("button"))){
+            }else if(S.inArray(e.target, self.$font.all("button"))){
+
             }else{
                 self.$font.hide();
             }
-            return false;
+            // 导致页面点击 失效
+            //return false;
         });
     };
     WKfont.prototype.command = {

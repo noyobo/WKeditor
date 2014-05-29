@@ -64,6 +64,13 @@ module.exports = function(grunt) {
                         src: ['**/*.js', '!**/*-min.js'],
                         dest: '<%= pkg.version %>/build',
                         ext: '-min.js'
+                    },
+                    {
+                        expand: true,
+                        cwd: '<%= pkg.version %>/plugin',
+                        src: ['**/*.js', '!**/*-min.js'],
+                        dest: '<%= pkg.version %>/plugin',
+                        ext: '-min.js'
                     }
                 ]
             }
@@ -96,7 +103,7 @@ module.exports = function(grunt) {
                     proxyHosts:['demo'],
                     servlet:'?',
                     separator:',',
-                    charset:'gbk', 
+                    charset:'gbk',
                     filter:{
                         '-min\\.js':'.js'
                     }
@@ -113,7 +120,7 @@ module.exports = function(grunt) {
                         expand: true,
 						cwd:'<%= pkg.version %>/',
                         src: ['**/*.less',
-							'!build/**/*.less',   
+							'!build/**/*.less',
 							'!demo/**/*.less'],
                         dest: '<%= pkg.version %>/build/',
                         ext: '.less.css'
@@ -127,7 +134,7 @@ module.exports = function(grunt) {
         			expand: true,
 					cwd:'<%= pkg.version %>/',
 					src: ['**/*.scss',
-						'!build/**/*.scss',   
+						'!build/**/*.scss',
 						'!demo/**/*.scss'],
 					dest: '<%= pkg.version %>/build/',
         			ext: '.scss.css'
@@ -144,9 +151,10 @@ module.exports = function(grunt) {
 						src: [
 							'**/*.css',
 							'!build/**/*.css',
-							'!demo/**/*.css'
-						], 
-						dest: '<%= pkg.version %>/build/', 
+							'!demo/**/*.css',
+                            'plugin/*/*.js'
+						],
+						dest: '<%= pkg.version %>/build/',
 						filter: 'isFile'
 					}
 				]
@@ -210,7 +218,7 @@ module.exports = function(grunt) {
 	grunt.loadNpmTasks('grunt-flexcombo');
     grunt.loadNpmTasks('grunt-contrib-less');
 	grunt.loadNpmTasks('grunt-sass');
-	
+
 
 
 	grunt.registerTask('build', '默认构建任务', function() {
