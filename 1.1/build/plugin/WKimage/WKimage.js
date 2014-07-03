@@ -80,7 +80,7 @@ KISSY.add(function(S, Node, Base) {
             return template;
         }
         self.view.pixeler = function(src, angle, callback) {
-            KISSY.use('pixeler', function(S, Pixeler) {
+            KISSY.use('gallery/pixeler/1.0/index', function(S, Pixeler) {
                 var pixeler = new Pixeler();
 
                 function getCanvasUrl(src) {
@@ -104,7 +104,11 @@ KISSY.add(function(S, Node, Base) {
                     getCanvasUrl(src)
                 }
             });
-        }
+        };
+        /**
+         * 插入图片
+         * @param  {String} ul 图片地址
+         */
         self.view.insertImage = function(ul) {
             var len = ul.length,
                 lastp;
@@ -136,139 +140,135 @@ KISSY.add(function(S, Node, Base) {
         var self = this;
         var btn = self.$image.one("#J_UploaderBtn");
 
-        S.use('gallery/uploader/1.5/index,gallery/uploader/1.5/themes/default/index,gallery/uploader/1.5/themes/default/style.css', function(S, Uploader, DefaultTheme) {
+        S.use('gallery/uploader/1.5/index, gallery/uploader/1.5/themes/default/index, gallery/uploader/1.5/themes/default/style.css',
+            function(S, Uploader, DefaultTheme) {
+                //上传插件
+                var plugins = 'gallery/uploader/1.5/plugins/auth/auth,' +
+                    'gallery/uploader/1.5/plugins/urlsInput/urlsInput,' +
+                    'gallery/uploader/1.5/plugins/proBars/proBars';
 
+                S.use(plugins, function(S, Auth, UrlsInput, ProBars, Filedrop, Preview, TagConfig) {
 
-            //上传插件
-            var plugins = 'gallery/uploader/1.5/plugins/auth/auth,' +
-                'gallery/uploader/1.5/plugins/urlsInput/urlsInput,' +
-                'gallery/uploader/1.5/plugins/proBars/proBars';
-
-            S.use(plugins, function(S, Auth, UrlsInput, ProBars, Filedrop, Preview, TagConfig) {
-
-                if(S.all('#J_uploadTemp').length){
-                    S.all('#J_uploadTemp').fire('focus').hide();
-                }
-
-                var multiple = self.config.multiple || true;
-
-                var type = "flash";
-                if (self.browser.mozilla || self.browser.safari || self.browser.chrome) {
-                    type = "ajax";
-                }
-
-                if (self.browser.safari) {
-                    multiple = false;
-                }
-                self.$uploader = new Uploader('#J_UploaderBtn', {
-                    //处理上传的服务器端脚本路径
-                    type: type,
-                    //手动控制flash的尺寸
-                    swfSize: {
-                        "width": 90,
-                        "height": 45
-                    },
-                    action: self.config.action,
-                    multiple: multiple,
-                    autoUpload: "true"
-                });
-                if (!self.browser.msie) {
-                    self.event.html5Upload(self.$image);
-                }
-
-                var addFileBtn = self.$image.one(".ks-uploader-button");
-
-
-                //使用主题
-                self.$uploader.theme(new DefaultTheme({
-                    queueTarget: '#J_UploaderQueue'
-                }))
-                //验证插件
-                .plug(new Auth({
-                    //最多上传个数
-                    max: 100,
-                    //图片最大允许大小
-                    maxSize: 10 * 1024,
-                    allowExts: self.config.allowExts
-
-                }))
-                //url保存插件
-                .plug(new UrlsInput({
-                    target: '#J_Urls'
-                }))
-                //进度条集合
-                .plug(new ProBars({}));
-
-
-
-                self.$uploader.on("select", function(ev) {
-                    $("#J_UploaderQueue").show();
-                    $(".btn-confirm").show();
-                    self.$image.one(".up_btn").css({
-                        width: 205
-                    });
-                });
-                self.$uploader.on("add", function(ev) {
-                    var target = ev.file.target;
-
-                    target.one(".upload-cancel").on("click", function() {
-                        $(this).next().fire("click");
-                        self.$uploader.uploadFiles("waiting");
-                    });
-
-
-                    target.one(".waiting-status").remove();
-                    target.addClass("queue-file");
-                    if (self.options.uploaderkey) {
-                        return;
+                    if (S.all('#J_uploadTemp').length) {
+                        S.all('#J_uploadTemp').fire('focus').hide();
                     }
-                    self.tool.realign(S.one("#J_UploaderQueue"));
-                    self.options.uploaderkey = setTimeout(function() {
+
+                    var multiple = self.config.multiple || true;
+
+                    var type = "flash";
+                    if (self.browser.mozilla || self.browser.safari || self.browser.chrome) {
+                        type = "ajax";
+                    }
+
+                    if (self.browser.safari) {
+                        multiple = false;
+                    }
+                    self.$uploader = new Uploader('#J_UploaderBtn', {
+                        //处理上传的服务器端脚本路径
+                        type: type,
+                        //手动控制flash的尺寸
+                        swfSize: {
+                            "width": 90,
+                            "height": 45
+                        },
+                        action: self.config.action,
+                        multiple: multiple,
+                        autoUpload: "true"
+                    });
+                    if (!self.browser.msie) {
+                        self.event.html5Upload(self.$image);
+                    }
+
+                    var addFileBtn = self.$image.one(".ks-uploader-button");
+
+
+                    //使用主题
+                    self.$uploader.theme(new DefaultTheme({
+                        queueTarget: '#J_UploaderQueue'
+                    }))
+                    //验证插件
+                    .plug(new Auth({
+                        //最多上传个数
+                        max: 100,
+                        //图片最大允许大小
+                        maxSize: 10 * 1024,
+                        allowExts: self.config.allowExts
+
+                    }))
+                    //url保存插件
+                    .plug(new UrlsInput({
+                        target: '#J_Urls'
+                    }))
+                    //进度条集合
+                    .plug(new ProBars({}));
+
+
+
+                    self.$uploader.on("select", function(ev) {
+                        $("#J_UploaderQueue").show();
+                        $(".btn-confirm").show();
+                        self.$image.one(".up_btn").css({
+                            width: 205
+                        });
+                    });
+                    self.$uploader.on("add", function(ev) {
+                        var target = ev.file.target;
+
+                        target.one(".upload-cancel").on("click", function() {
+                            $(this).next().fire("click");
+                            self.$uploader.uploadFiles("waiting");
+                        });
+
+
+                        target.one(".waiting-status").remove();
+                        target.addClass("queue-file");
+                        if (self.options.uploaderkey) {
+                            return;
+                        }
                         self.tool.realign(S.one("#J_UploaderQueue"));
-                        clearTimeout(self.options.uploaderkey);
-                        self.options.uploaderkey = null
-                        self.tool.dragSort(self);
-                    }, 100);
+                        self.options.uploaderkey = setTimeout(function() {
+                            self.tool.realign(S.one("#J_UploaderQueue"));
+                            clearTimeout(self.options.uploaderkey);
+                            self.options.uploaderkey = null
+                            self.tool.dragSort(self);
+                        }, 100);
 
-                });
-                self.$uploader.on("success", function(ev) {
-                    var result = ev.file.result;
-                    var target = ev.file.target;
-                    target.html("").append(self.view.preview(result));
-                    // _class.tool.realign(S.one("#J_UploaderQueue"));
-                    // _class.plugin.dragSort(target);
-                });
-                self.$uploader.on("error", function(ev) {
-                    var target = ev.file.target;
-                    var queue = self.$uploader.get('queue');
-                    target.one(".error-status").one("span").text("不符合要求");
-                    target.one(".error-status").one("a").addClass("del-pic");
+                    });
+                    self.$uploader.on("success", function(ev) {
+                        var result = ev.file.result;
+                        var target = ev.file.target;
+                        target.html("").append(self.view.preview(result));
+                        // _class.tool.realign(S.one("#J_UploaderQueue"));
+                        // _class.plugin.dragSort(target);
+                    });
+                    self.$uploader.on("error", function(ev) {
+                        var target = ev.file.target;
+                        var queue = self.$uploader.get('queue');
+                        target.one(".error-status").one("span").text("不符合要求");
+                        target.one(".error-status").one("a").addClass("del-pic");
 
-                    //ev.file.target.remove();
+                        //ev.file.target.remove();
+                    });
+                    self.$uploader.on("remove", function(ev) {
+                        //ev.file.target.remove();
+                        var target = ev.file.target;
+                        target.remove();
+                        self.tool.realign(S.one("#J_UploaderQueue"));
+                        if (S.one("#J_UploaderQueue").children(".queue-file").length == 0) {
+                            self.view.uploadRest();
+                        }
+                    });
+                    self.$image.one('.btn-confirm').on("click", function() {
+                        if ($("#J_UploaderQueue").one(".error-status")) {
+                            alert("有不符合或未传完的图片!");
+                            return;
+                        }
+                        self.view.insertImage($("#J_UploaderQueue"));
+                        self.$image.remove();
+                    });
+                    return false;
                 });
-                self.$uploader.on("remove", function(ev) {
-                    //ev.file.target.remove();
-                    var target = ev.file.target;
-                    target.remove();
-                    self.tool.realign(S.one("#J_UploaderQueue"));
-                    if (S.one("#J_UploaderQueue").children(".queue-file").length == 0) {
-
-                        self.view.uploadRest();
-                    }
-
-                });
-                self.$image.one('.btn-confirm').on("click", function() {
-                    if ($("#J_UploaderQueue").one(".error-status")) {
-                        alert("有不符合或未传完的图片!");
-                        return;
-                    }
-                    self.view.insertImage($("#J_UploaderQueue"));
-                    self.$image.remove();
-                });
-
-                return false;
             });
-        });
 
         self.$image.all(".close").on("click", function() {
             self.$image.remove();

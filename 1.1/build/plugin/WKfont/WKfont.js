@@ -150,7 +150,7 @@ KISSY.add(function (S, Node,XTemplate) {
             }else{
                 self.$font.hide();
             }
-            // 导致页面点击 失效
+            // 导致页面 Flash 点击 失效
             //return false;
         });
     };

@@ -11,12 +11,12 @@ KISSY.add(function(S, Node, Base) {
 
         // 继承父类属性
         self.options = options
-        self.regExp = /www\.xiami\.com\/(?:song|album)\/(\d+)/;
+        self.regExp = /(?:www|i)\.xiami\.com\/(?:\w+\/)?(song|album|demo|showcollect\/id)\/(\d+)/;
     };
     WKmusic.prototype.tpl = {
         wrap: '<div class="WKeditor_music_plate">\
             <table><tr><td width="80%">\
-            <input value="http://www.xiami.com/song/53864?spm=a1z1s.6632057.350708705.10.mYNiuZ" key="toClear" title="请粘贴歌曲页面地址" placeholder="请粘贴歌曲页面地址"/>\
+            <input key="toClear" title="请粘贴虾米音乐页面地址" placeholder="请粘贴虾米音乐页面地址"/>\
             </td><td width="20%"><a href="javascript:void(0);" class="btn-confirm wk-btn btn-bg-blue btn-large">确认上传</a></td></tr></table>\
             <div class="close">×</div></div>'
     };
@@ -43,19 +43,32 @@ KISSY.add(function(S, Node, Base) {
         self.$overlay = self.tool.overlay({
             ele: self.$video
         }).$overlay;
-        self.view.preview = function(songID) {
+        self.view.preview = function(songID, type) {
             var p = $("<p class='musicBox'></p>");
-            var url = 'http://www.xiami.com/widget/0_' + songID + '/singlePlayer.swf';
             var embed = document.createElement("embed");
-            embed.setAttribute("height", "33");
-            embed.setAttribute("width", "257");
-            embed.setAttribute("allowscriptaccess", "always");
+            if (type === 'song' || type === 'demo') {
+                var url = 'http://www.xiami.com/widget/0_' + songID + '/singlePlayer.swf';
+                embed.setAttribute("height", "33");
+                embed.setAttribute("width", "257");
+            }
+            if (type === 'album') {
+                var url = 'http://www.xiami.com/widget/0_' + songID + '_235_346_FF8719_494949/albumPlayer.swf';
+                embed.setAttribute("height", "346");
+                embed.setAttribute("width", "235");
+            }
+            if (type === 'showcollect/id') {
+                var url = 'http://www.xiami.com/widget/0_' + songID + '_235_346_FF8719_494949_0/collectPlayer.swf';
+                embed.setAttribute("height", "346");
+                embed.setAttribute("width", "235");
+            }
+            embed.setAttribute("allowscriptaccess", "never");
             embed.setAttribute("type", "application/x-shockwave-flash");
             embed.setAttribute("wmode", "transparent");
             embed.setAttribute("style", "display:inline-block");
             embed.setAttribute("src", url);
             p.append(embed);
             return p;
+
         }
         self.view.insertVideo = function(url) {
             var urlExec = self.regExp.exec(url);
@@ -63,23 +76,22 @@ KISSY.add(function(S, Node, Base) {
                 alert("请输入正确的虾米歌曲页面地址");
                 return;
             };
-            var songID = urlExec[1];
+            var type = urlExec[1];
+            var songID = urlExec[2];
 
-            function doit(songID) {
-                var p = self.view.preview(songID);
-                self.$insertArea.before(p);
-                self.$insertArea.remove();
-                self.$overlay.remove();
-                self.$video.remove();
-                self.tool.setCart(p[0], self.options.range);
-            }
-            if (self.config && self.config.setUrl) {
-                doit(self.config.setUrl(url));
-            } else {
-                doit(songID);
-            }
+            self.doit(songID, type);
         }
         self.$insertArea = self.tool.insertArea();
+    };
+
+    WKmusic.prototype.doit = function(songID, type) {
+        var self = this;
+        var p = self.view.preview(songID, type);
+        self.$insertArea.before(p);
+        self.$insertArea.remove();
+        self.$overlay.remove();
+        self.$video.remove();
+        self.tool.setCart(p[0], self.options.range);
     };
 
     WKmusic.prototype.event = function() {
@@ -102,14 +114,13 @@ KISSY.add(function(S, Node, Base) {
         self.$video.one("input").fire("focus");
     };
 
-    WKmusic.prototype.init = function(config) {
+    WKmusic.prototype.init = function() {
         this.ele = this.options.ele;
         this.left = this.options.left;
         this.top = this.options.top;
         this.$wrap = this.options.$wrap;
         this.tool = this.options.tool;
         this.browser = this.tool.browser();
-        this.config = config;
         this.view();
         this.event();
     };
