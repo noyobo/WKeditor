@@ -145,7 +145,7 @@ KISSY.add(function(S, Node, Base) {
                 //上传插件
                 var plugins = 'gallery/uploader/1.5/plugins/auth/auth,' +
                     'gallery/uploader/1.5/plugins/urlsInput/urlsInput,' +
-                    'gallery/uploader/1.5/plugins/proBars/proBars';
+                    'gallery/uploader/1.5/plugins/proBars/proBars'
 
                 S.use(plugins, function(S, Auth, UrlsInput, ProBars, Filedrop, Preview, TagConfig) {
 
@@ -184,23 +184,23 @@ KISSY.add(function(S, Node, Base) {
 
                     //使用主题
                     self.$uploader.theme(new DefaultTheme({
-                        queueTarget: '#J_UploaderQueue'
-                    }))
-                    //验证插件
-                    .plug(new Auth({
-                        //最多上传个数
-                        max: 100,
-                        //图片最大允许大小
-                        maxSize: 10 * 1024,
-                        allowExts: self.config.allowExts
+                            queueTarget: '#J_UploaderQueue'
+                        }))
+                        //验证插件
+                        .plug(new Auth({
+                            //最多上传个数
+                            max: 100,
+                            //图片最大允许大小
+                            maxSize: 20 * 1024,
+                            allowExts: self.config.allowExts
 
-                    }))
-                    //url保存插件
-                    .plug(new UrlsInput({
-                        target: '#J_Urls'
-                    }))
-                    //进度条集合
-                    .plug(new ProBars({}));
+                        }))
+                        //url保存插件
+                        .plug(new UrlsInput({
+                            target: '#J_Urls'
+                        }))
+                        //进度条集合
+                        .plug(new ProBars({}))
 
 
 
@@ -242,6 +242,7 @@ KISSY.add(function(S, Node, Base) {
                         // _class.plugin.dragSort(target);
                     });
                     self.$uploader.on("error", function(ev) {
+                        console.log(ev);
                         var target = ev.file.target;
                         var queue = self.$uploader.get('queue');
                         target.one(".error-status").one("span").text("不符合要求");
@@ -316,31 +317,32 @@ KISSY.add(function(S, Node, Base) {
                         status: "waiting",
                         textSize: file.size / 1024 + "kB"
                     };
-                    //var queue = _class._default.uploader.get('queue');
-                    // var testFile = queue.add(testFile);
-                    //    testFile.data = file;
+                    // console.log(testFile);
+                    // var queue = self.$uploader.get('queue');
+                    // var queueFiles = queue.add(testFile);
+                    testFile.data = file;
+                    self.$uploader._select({
+                        files: testFile
+                    })
+                    // var $li = $("<li class='queue-file'></li>");
+                    // $li.append(self.view.preview({
+                    //     url: "",
+                    //     resize_url: "",
+                    //     width: 0,
+                    //     height: 0
+                    // }));
 
-                    //_class._default.uploader.fire("select",{file:[testFile]});
+                    // $li.one(".pic").html("").append(img);
 
-                    var $li = $("<li class='queue-file'></li>");
-                    $li.append(self.view.preview({
-                        url: "",
-                        resize_url: "",
-                        width: 0,
-                        height: 0
-                    }));
+                    // S.one("#J_UploaderQueue").append($li);
+                    // var reader = new FileReader();
+                    // reader.onload = (function(aImg) {
+                    //     return function(e) {
+                    //         aImg.src = e.target.result;
 
-                    $li.one(".pic").html("").append(img);
-
-                    S.one("#J_UploaderQueue").append($li);
-                    var reader = new FileReader();
-                    reader.onload = (function(aImg) {
-                        return function(e) {
-                            aImg.src = e.target.result;
-
-                        };
-                    })(img);
-                    reader.readAsDataURL(file);
+                    //     };
+                    // })(img);
+                    // reader.readAsDataURL(file);
                 }
                 $("#J_UploaderQueue").show();
                 $(".btn-confirm").show();

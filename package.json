@@ -1,16 +1,17 @@
 {
-    "name": "WKeditor",
-    "version": "1.1.0",
-    "devDependencies": {
-        "grunt-contrib-uglify": "~0.2.0",
-        "grunt": "~0.4.1",
-        "grunt-kmc": "~0.1.1",
-		"grunt-flexcombo":"",
-        "grunt-sass":"~0.10.0",
-        "grunt-contrib-less": "~0.5.0",
-		"grunt-contrib-copy": "",
-		"grunt-contrib-clean": "~0.4.0",
-		"grunt-contrib-cssmin": "~0.5.0",
-		"grunt-contrib-watch": ""
-    }
+  "name": "WKeditor",
+  "version": "1.1.0",
+  "devDependencies": {
+    "grunt": "~0.4.1",
+    "grunt-contrib-clean": "~0.4.0",
+    "grunt-contrib-copy": "",
+    "grunt-contrib-cssmin": "~0.5.0",
+    "grunt-contrib-less": "~0.5.0",
+    "grunt-contrib-uglify": "~0.2.0",
+    "grunt-contrib-watch": "",
+    "grunt-flexcombo": "",
+    "grunt-kmc": "~0.1.1",
+    "grunt-sass": "~0.10.0",
+    "kissy": "^1.4.8"
+  }
 }

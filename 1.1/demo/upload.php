@@ -50,13 +50,13 @@ if($size > 3) delDirAndFile($dirName);
 $files_name_arr = array($fileInput);
 foreach($files_name_arr as $k=>$v){
 	$pic = $_FILES[$v];
-	$isExceedSize = $pic['size'] > 500000;
+	$isExceedSize = $pic['size'] > 50000000;
 	if(!$isExceedSize){
 		if(file_exists($dir.$pic['name'])){
 			@unlink($dir.$pic['name']);
 		}
         // 解决中文文件名乱码问题
-        $pic['name'] = iconv('UTF-8', 'GBK', $pic['name']);
+    $pic['name'] = iconv('UTF-8', 'GBK', $pic['name']);
 		$result = move_uploaded_file($pic['tmp_name'], $dir.$pic['name']);
 		$files[$k] = $url.$dir.$pic['name'];
 	}

@@ -4,7 +4,7 @@
 <head>
     <meta charset="utf-8" />
     <title>WKeditor 1.2</title>
-    <script src="http://g.tbcdn.cn/kissy/k/1.4.3/seed.js" charset="utf-8"></script>
+    <script src="../../node_modules/kissy/build/seed.js" charset="utf-8"></script>
 
 </head>
 
@@ -15,12 +15,13 @@
     }
     body {
         background: #eee;
-        font:12px/1.5"微软雅黑";
+        font: 12px/1.5"微软雅黑";
     }
     #wankePost {
         width: 45%;
         margin: 0 auto;
         /*margin-left: 60px;*/
+        
         background: #fff;
         padding: 10px;
         border-radius: 5px;
@@ -49,13 +50,13 @@
         text-align: center;
     }
     .top {
-        background:#336699;
-        padding:20px;
-        color:#fff;
+        background: #336699;
+        padding: 20px;
+        color: #fff;
     }
     .top .bb {
-        width:800px;
-        margin:auto
+        width: 800px;
+        margin: auto
     }
     #WKeditor .ForeColor {
         background: #333;
@@ -111,14 +112,18 @@
     if (S.Config.debug) {
         var srcPath = "../../../";
         S.config({
-            packages:[
-                {
-                    name:"gallery/WKeditor",
-                    path:"../../../WKeditor",
-                    charset:"utf-8",
-                    ignorePackageNameInUri:true
-                }
-            ]
+            packages: [{
+                name: "gallery/WKeditor",
+                path: "../../../WKeditor",
+                charset: "utf-8",
+                tag: Date.now(),
+                ignorePackageNameInUri: true
+            },{
+                name: 'gallery/uploader',
+                path: '../../../uploader/',
+                tag: Date.now(),
+                ignorePackageNameInUri: true
+            }]
         });
     }
 
@@ -220,8 +225,8 @@
             KISSY.use("gallery/WKeditor/1.1/plugin/WKimage/WKimage, gallery/WKeditor/1.1/plugin/WKimage/WKimage.css", function(S, WKimage) {
                 var config = {
                     action: "upload.php",
-                    allowExts: "jpg,gif,png,jpeg"
-                    //dragSort:true
+                    allowExts: "jpg,gif,png,jpeg,JPG,JPEG"
+                        //dragSort:true
                 };
                 self.WKimage = new WKimage(self.options);
                 self.WKimage.init(config);
